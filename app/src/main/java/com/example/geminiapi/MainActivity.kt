@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         )
 
         CoroutineScope(Dispatchers.Main).launch {
-            binding.tvMain.text = generateTextFromTextAndImageInput(generativeModel)
+            binding.tvMain.text = multiConversations(generativeModel)
         }
     }
 
@@ -64,6 +64,21 @@ class MainActivity : AppCompatActivity() {
         }
 
         val response = generativeModel.generateContent(inputContent)
+        return response.text
+    }
+
+    // Multi-turn conversations (chat)
+    private suspend fun multiConversations(generativeModel: GenerativeModel): String? {
+        val userText = "Hello, I have 2 dogs in my house."
+        val modelText = "Great to meet you. What would you like to know?"
+        val chat = generativeModel.startChat(
+            listOf(
+                content(role = "user") { text(userText) },
+                content(role = "model") { text(modelText) }
+            )
+        )
+
+        val response = chat.sendMessage("How many paws are in my house?")
         return response.text
     }
 }
