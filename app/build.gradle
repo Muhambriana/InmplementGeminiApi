@@ -10,8 +10,8 @@ android {
 
     defaultConfig {
         applicationId "com.example.geminiapi"
-        minSdk 24
-        targetSdk 34
+        minSdk 27
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
@@ -50,4 +50,7 @@ dependencies {
 
     // Gen AI
     implementation libs.generativeAi
+
+    implementation(libs.ssp.android)
+    implementation(libs.sdp.android)
 }
