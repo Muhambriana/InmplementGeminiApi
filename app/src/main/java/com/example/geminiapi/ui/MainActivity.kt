@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
     private fun firstInit() {
         val generativeModel = GenerativeModel(
             modelName = "gemini-1.5-flash",
-            apiKey = BuildConfig.aiStudioApiKey
+            apiKey = BuildConfig.AI_STUDIO_API_KEY
         )
 
         binding.btnSubmit.setOnClickListener {
