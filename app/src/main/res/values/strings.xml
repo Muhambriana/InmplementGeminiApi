@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">GeminiApi</string>
+    <string name="type_here">Type here</string>
+    <string name="send">Send</string>
 </resources>
