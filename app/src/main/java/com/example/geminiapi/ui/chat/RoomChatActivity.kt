@@ -1,21 +1,19 @@
 package com.example.geminiapi.ui.chat
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.geminiapi.BuildConfig
-import com.example.geminiapi.R
 import com.example.geminiapi.core.adapter.ChatAdapter
-import com.example.geminiapi.core.adapter.ChatAdapter2
 import com.example.geminiapi.core.models.Chat
-import com.example.geminiapi.core.models.Chat2
 import com.example.geminiapi.databinding.ActivityRoomChatBinding
 import com.example.geminiapi.utils.config.ChatType
+import com.example.geminiapi.utils.helper.Helper.showShortToast
 import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.Content
 import com.google.ai.client.generativeai.type.content
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,8 +26,8 @@ class RoomChatActivity : AppCompatActivity() {
         ActivityRoomChatBinding.inflate(layoutInflater)
     }
 
-    private val chatAdapter: ChatAdapter2 by lazy {
-        ChatAdapter2()
+    private val chatAdapter: ChatAdapter by lazy {
+        ChatAdapter()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +46,7 @@ class RoomChatActivity : AppCompatActivity() {
     private fun firstInit() {
         val generativeModel = GenerativeModel(
             modelName = "gemini-1.5-flash",
-            apiKey = BuildConfig.aiStudioApiKey
+            apiKey = BuildConfig.AI_STUDIO_API_KEY
         )
         binding.rvChat.apply {
             adapter = chatAdapter
@@ -62,22 +60,6 @@ class RoomChatActivity : AppCompatActivity() {
             delay(2000)
             multiConversationsStream(generativeModel)
         }
-    }
-
-
-    private fun getDataDummy(): MutableList<Chat> {
-        return mutableListOf(
-            Chat(ChatType.USER, "You", "How are you today?"),
-            Chat(ChatType.MODEL, "Gemini", "Good, how about you?"),
-            Chat(ChatType.USER, "You", "I'm doing well, thanks for asking!"),
-            Chat(ChatType.MODEL, "Gemini", "That's great to hear! What are your plans for today?"),
-            Chat(ChatType.USER, "You", "I plan to work on some coding projects."),
-            Chat(ChatType.MODEL, "Gemini", "Sounds interesting! Which project are you working on?"),
-            Chat(ChatType.USER, "You", "I'm building a chat application."),
-            Chat(ChatType.MODEL, "Gemini", "That sounds fun! Do you need any help with it?"),
-            Chat(ChatType.USER, "You", "I think I'm good for now, but I'll let you know if I need assistance."),
-            Chat(ChatType.MODEL, "Gemini", "Sure! Just reach out whenever you need help.")
-        )
     }
 
     // Multi-turn conversations (chat)
@@ -94,19 +76,54 @@ class RoomChatActivity : AppCompatActivity() {
         )
         chatAdapter.setData(
             listOf(
-                Chat2(ChatType.USER, "You", history[0]),
-                Chat2(ChatType.MODEL, "Gemini", history[1])
+                Chat(1, ChatType.USER, "You", history[0]),
+                Chat(2, ChatType.MODEL, "Gemini", history[1])
             )
         )
 
 
-        val question = "How many paws are in my house?, and give me long story telling about dog"
-        val chatQuestion = Chat2(ChatType.USER, "You", content(role = "user") {text(question)})
+        val question = "i have 3 new cat, and give me very short story telling about dog"
+        val chatQuestion = Chat(3, ChatType.USER, "You", content(role = "user") {text(question)})
         chatAdapter.addItem(chatQuestion)
+        chatAdapter.addItem( Chat(4, ChatType.MODEL, "Gemini", content(role = "model") { text("...") }))
         delay(2000)
         chat.sendMessageStream(question).collect { res ->
-            chatAdapter.addItem(Chat2(ChatType.MODEL, "Gemini", content(role = "user") { text(res.text.toString()) }))
+            chatAdapter.updateItem(Chat(4, ChatType.MODEL, "Gemini", content(role = "model") { text(res.text.toString()) }))
+            binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
         }
+
+
+        delay(5000)
+        val question2 = "How many cat are in my house?, and total cat and dogs that i have?"
+        val chatQuestion2 = Chat(5, ChatType.USER, "You", content(role = "user") {text(question2)})
+        chatAdapter.addItem(chatQuestion2)
+        chatAdapter.addItem( Chat(6, ChatType.MODEL, "Gemini", content(role = "model") { text("...") }))
+        delay(2000)
+        chat.sendMessageStream(question2).collect { res ->
+            chatAdapter.updateItem(Chat(6, ChatType.MODEL, "Gemini", content(role = "model") { text(res.text.toString()) }))
+            binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
+        }
+        var count = 6
+        binding.btnSend.setOnClickListener {
+            count += 1
+            var currentId = count
+            val question3 = binding.edPrompt.text.toString()
+            val chatQuestion3 = Chat(currentId, ChatType.USER, "You", content(role = "user") {text(question3)})
+            currentId+=1
+            val geminiId = currentId
+            showShortToast("$count === $currentId === $geminiId")
+            chatAdapter.addItem(chatQuestion3)
+            chatAdapter.addItem(Chat(geminiId, ChatType.MODEL, "Gemini", content(role = "model") { text("...") }))
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(2000)
+                chat.sendMessageStream(question3).collect { res ->
+                    Log.d("kocak", "$question3 === $geminiId")
+                    chatAdapter.updateItem(Chat(geminiId, ChatType.MODEL, "Gemini", content(role = "model") { text(res.text.toString()) }))
+                    binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
+                }
+            }
+        }
+
 
     }
 }
