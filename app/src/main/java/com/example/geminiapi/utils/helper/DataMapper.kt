@@ -13,7 +13,6 @@ import com.google.ai.client.generativeai.type.content
 object DataMapper {
     fun mapToModel(lastChatId: Int, chatType: ChatType, text: String): LocalChat {
         val id = lastChatId.plus(1)
-        Log.d("kocak3", "old: $lastChatId ||||| new: $id")
         return LocalChat(
             id,
             chatType,

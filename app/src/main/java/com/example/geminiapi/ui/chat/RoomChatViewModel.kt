@@ -11,6 +11,7 @@ import com.example.geminiapi.core.data.GeminiRepository
 import com.example.geminiapi.core.data.Resource
 import com.example.geminiapi.core.models.LocalChat
 import com.example.geminiapi.utils.config.ChatType
+import com.example.geminiapi.utils.config.Prompt
 import com.example.geminiapi.utils.helper.Helper
 import com.google.ai.client.generativeai.Chat
 import com.google.ai.client.generativeai.type.Content
@@ -31,7 +32,7 @@ class RoomChatViewModel(private val repository: GeminiRepository) : ViewModel() 
         }
     }
 
-    fun getMessageStream(chat: Chat?, prompt: String) {
+    fun getMessageStream(chat: Chat?, prompt: Prompt) {
         _response.postValue(GeminiEvent(Resource.Loading()))
         viewModelScope.launch {
             repository.getStreamMessage(chat, prompt)?.collect { res ->
@@ -39,22 +40,4 @@ class RoomChatViewModel(private val repository: GeminiRepository) : ViewModel() 
             }
         }
     }
-
-//    fun getMessageStream(chat: Chat?, prompt: Bitmap) {
-//        response.postValue(Resource.Loading())
-//        viewModelScope.launch {
-//            repository.getStreamMessage(chat, prompt)?.collect { res ->
-//                response.postValue(Resource.Success(res.text.toString()))
-//            }
-//        }
-//    }
-//
-//    fun getMessageStream(chat: Chat?, prompt: Content) {
-//        response.postValue(Resource.Loading())
-//        viewModelScope.launch {
-//            repository.getStreamMessage(chat, prompt)?.collect { res ->
-//                response.postValue(Resource.Success(res.text.toString()))
-//            }
-//        }
-//    }
 }

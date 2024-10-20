@@ -18,6 +18,7 @@ import com.example.geminiapi.core.data.source.remote.GeminiDataSource
 import com.example.geminiapi.core.models.LocalChat
 import com.example.geminiapi.databinding.ActivityRoomChatBinding
 import com.example.geminiapi.utils.config.ChatType
+import com.example.geminiapi.utils.config.Prompt
 import com.example.geminiapi.utils.helper.DataMapper
 import com.example.geminiapi.utils.helper.Helper
 import com.example.geminiapi.utils.helper.Helper.showShortToast
@@ -74,7 +75,7 @@ class RoomChatActivity : AppCompatActivity() {
 
     private fun viewInitialization() {
         binding.btnSend.setOnClickListener {
-            askGemini2()
+            askGemini()
         }
     }
 
@@ -90,7 +91,7 @@ class RoomChatActivity : AppCompatActivity() {
     }
 
     private fun startChat() {
-        val userText = "help me calculation, just help me and give me the result"
+        val userText = "help me calculation"
         val modelText = "okay."
         val history = listOf(
             getLocalChat(ChatType.USER, userText),
@@ -108,59 +109,28 @@ class RoomChatActivity : AppCompatActivity() {
                 is Resource.Loading -> {}
                 is Resource.Success -> {
                     chat = resources.data
-                    lifecycleScope.launch {
-//                        askGemini()
-                    }
                 }
             }
         }
     }
 
-    private suspend fun askGemini() {
-        delay(2000)
-        val question = "i have 3 new cat, and give me very short story telling about dog"
-        val localChatUser = getLocalChat(ChatType.USER, question)
-        chatAdapter.addItem(localChatUser)
-        val localChatModel = getLocalChat(ChatType.MODEL, "...")
-        chatAdapter.addItem(localChatModel)
-        delay(2000)
-        roomChatViewModel.getMessageStream(chat, question)
-//        roomChatViewModel.response.observe(this) { resources ->
-//            when (resources) {
-//                is Resource.Loading -> {}
-//                is Resource.Success -> {
-//                    val new = localChatModel.apply {
-//                        this.content = Helper.appendTextToContent(this.content, resources.data.toString())
-//                    }
-//                    Log.d("kocak2", "${new.id} || ${new.type} || ${new.type?.alias} || ${Helper.getTextFromContent(new.content)}")
-//                    chatAdapter.updateItem(new)
-//                    binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
-//                }
-//            }
-//        }
-    }
-
-    private fun askGemini2() {
+    private fun askGemini() {
         //This is temp solution. Need to find best solution
         roomChatViewModel.response.removeObservers(this)
         val question = binding.edPrompt.text.toString()
         val localChatUser = getLocalChat(ChatType.USER, question)
         chatAdapter.addItem(localChatUser)
         val localChatModel = getLocalChat(ChatType.MODEL, "...")
-        showShortToast("${Helper.getTextFromContent(localChatModel.content)} === ${localChatModel.id}")
         chatAdapter.addItem(localChatModel)
-        roomChatViewModel.getMessageStream(chat, question)
+        roomChatViewModel.getMessageStream(chat, Prompt.TextPrompt(question))
         roomChatViewModel.response.observe(this) { event ->
             event.getContentIfNotHandled().let { resources ->
                 when (resources) {
                     is Resource.Loading -> {}
                     is Resource.Success -> {
-                        Log.d("kocak201",  resources.data.toString())
                         val new  = localChatModel.apply {
                             this.content = Helper.appendTextToContent(this.content, resources.data.toString())
                         }
-                        Log.d("kocak2", "${new.id} || ${new.type} || ${new.type?.alias} || ${Helper.getTextFromContent(new.content)}")
-
                         chatAdapter.updateItem(new)
                         binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
                     }

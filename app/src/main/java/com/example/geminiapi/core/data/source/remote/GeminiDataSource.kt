@@ -1,8 +1,7 @@
 package com.example.geminiapi.core.data.source.remote
 
-import android.graphics.Bitmap
-import android.util.Log
 import com.example.geminiapi.BuildConfig
+import com.example.geminiapi.utils.config.Prompt
 import com.google.ai.client.generativeai.Chat
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.Content
@@ -19,12 +18,16 @@ class GeminiDataSource {
     suspend fun getStartChat(history: List<Content>): Chat =
         generativeModel.startChat(history)
 
-    suspend fun getStreamMessage(chat: Chat?, prompt: String): Flow<GenerateContentResponse>? =
-        chat?.sendMessageStream(prompt)
-
-    suspend fun getStreamMessage(chat: Chat?, prompt: Content): Flow<GenerateContentResponse>? =
-        chat?.sendMessageStream(prompt)
-
-    suspend fun getStreamMessage(chat: Chat?, prompt: Bitmap): Flow<GenerateContentResponse>? =
-        chat?.sendMessageStream(prompt)
+    suspend fun getStreamMessage(chat: Chat?, prompt: Prompt): Flow<GenerateContentResponse>? =
+        when(prompt) {
+            is Prompt.TextPrompt -> {
+                chat?.sendMessageStream(prompt.text)
+            }
+            is Prompt.BitmapPrompt -> {
+                chat?.sendMessageStream(prompt.bitmap)
+            }
+            is Prompt.ContentPrompt -> {
+                chat?.sendMessageStream(prompt.content)
+            }
+        }
 }
