@@ -9,15 +9,20 @@ import com.google.ai.client.generativeai.type.Content
 import com.google.ai.client.generativeai.type.GenerateContentResponse
 import com.google.ai.client.generativeai.type.HarmCategory
 import com.google.ai.client.generativeai.type.SafetySetting
+import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.flow.Flow
 
 
 class GeminiDataSource {
     private val harassmentSafety = SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.MEDIUM_AND_ABOVE)
     private val hateSpeechSafety = SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.LOW_AND_ABOVE)
+    private val config = generationConfig {
+        temperature = 0.9f
+    }
     private val generativeModel: GenerativeModel = GenerativeModel(
         modelName = "gemini-1.5-flash",
         apiKey = BuildConfig.AI_STUDIO_API_KEY,
+        config,
         safetySettings = listOf(harassmentSafety, hateSpeechSafety)
     )
 
