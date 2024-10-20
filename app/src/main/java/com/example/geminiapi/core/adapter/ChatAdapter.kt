@@ -8,9 +8,7 @@ import com.example.geminiapi.core.models.LocalChat
 import com.example.geminiapi.databinding.ItemListMessageInBinding
 import com.example.geminiapi.databinding.ItemListMessageOutBinding
 import com.example.geminiapi.utils.config.ChatType
-import com.example.geminiapi.utils.helper.Helper
 import com.example.geminiapi.utils.helper.Helper.getTextFromContent
-import com.google.ai.client.generativeai.type.TextPart
 
 class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
 
