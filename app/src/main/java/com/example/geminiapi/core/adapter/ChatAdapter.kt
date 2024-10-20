@@ -23,7 +23,6 @@ class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
         // Scroll to the bottom of the RecyclerView after updating
     }
 
-
     fun addItem(localChat: LocalChat?) {
         if (localChat == null) return
         listOfLocalChat.add(localChat)

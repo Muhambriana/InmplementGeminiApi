@@ -25,22 +25,23 @@ class GeminiDataSource {
         config,
         safetySettings = listOf(harassmentSafety, hateSpeechSafety)
     )
+    private val chat = generativeModel.startChat()
 
     suspend fun getStartChat(history: List<Content>): Chat =
         generativeModel.startChat(history)
 
-    suspend fun getStreamMessage(chat: Chat?, prompt: Prompt): Result<Flow<GenerateContentResponse>?> =
+    suspend fun getStreamMessage(prompt: Prompt): Result<Flow<GenerateContentResponse>?> =
         try {
             Result.success(
                 when(prompt) {
                     is Prompt.TextPrompt -> {
-                        chat?.sendMessageStream(prompt.text)
+                        chat.sendMessageStream(prompt.text)
                     }
                     is Prompt.BitmapPrompt -> {
-                        chat?.sendMessageStream(prompt.bitmap)
+                        chat.sendMessageStream(prompt.bitmap)
                     }
                     is Prompt.ContentPrompt -> {
-                        chat?.sendMessageStream(prompt.content)
+                        chat.sendMessageStream(prompt.content)
                     }
                 }
             )

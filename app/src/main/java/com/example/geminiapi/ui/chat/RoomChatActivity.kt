@@ -18,7 +18,6 @@ import com.example.geminiapi.databinding.ActivityRoomChatBinding
 import com.example.geminiapi.utils.config.ChatType
 import com.example.geminiapi.utils.config.Prompt
 import com.example.geminiapi.utils.helper.DataMapper
-import com.example.geminiapi.utils.helper.Helper
 import com.example.geminiapi.utils.helper.Helper.showShortToast
 import com.google.ai.client.generativeai.Chat
 
@@ -32,6 +31,7 @@ class RoomChatActivity : AppCompatActivity() {
     private val geminiDataSource: GeminiDataSource by lazy { GeminiDataSource() }
     private val localDataSource: LocalDataSource by lazy { LocalDataSource() }
     private var chat: Chat? = null
+    private var listLocalChat = mutableListOf<LocalChat>()
 
     private lateinit var chatAdapter: ChatAdapter
     private lateinit var roomChatViewModel: RoomChatViewModel
@@ -84,25 +84,11 @@ class RoomChatActivity : AppCompatActivity() {
     }
 
     private fun startChat() {
-        val userText = "help me calculation"
-        val modelText = "okay."
-        val history = listOf(
-            getLocalChat(ChatType.USER, userText),
-            getLocalChat(ChatType.MODEL, modelText)
-        )
-        chatAdapter.setData(history)
-        roomChatViewModel.getStartChat(
-            listOf(
-                history[0].content,
-                history[1].content
-            )
-        )
+        roomChatViewModel.getStartChat()
         roomChatViewModel.geminiChat.observe(this) { resources ->
             when (resources) {
                 is Resource.Loading -> {}
-                is Resource.Success -> {
-                    chat = resources.data
-                }
+                is Resource.Success -> { chat = resources.data }
                 is Resource.Empty -> {}
                 is Resource.Error -> {}
             }
@@ -110,35 +96,49 @@ class RoomChatActivity : AppCompatActivity() {
     }
 
     private fun askGemini() {
-        //This is temp solution. Need to find best solution
+        // Remove existing observers to prevent duplicate calls. THIS IS TEMP SOLUTION
         roomChatViewModel.response.removeObservers(this)
+
+        // Retrieve user input and create local chat items
         val question = binding.edPrompt.text.toString()
         val localChatUser = getLocalChat(ChatType.USER, question)
-        chatAdapter.addItem(localChatUser)
         val localChatModel = getLocalChat(ChatType.MODEL, "...")
-        chatAdapter.addItem(localChatModel)
-        roomChatViewModel.getMessageStream(chat, Prompt.TextPrompt(question))
+
+        // Update local chat list and adapter
+        listLocalChat.apply {
+            add(localChatUser)
+            add(localChatModel)
+        }
+        chatAdapter.apply {
+            addItem(localChatUser)
+            addItem(localChatModel)
+        }
+
+        // Send message and observe response
+        roomChatViewModel.sendMessage(localChatModel, Prompt.TextPrompt(question))
+        observeResponse()
+    }
+
+    private fun observeResponse() {
         roomChatViewModel.response.observe(this) { event ->
-            event.getContentIfNotHandled().let { resources ->
+            event.getContentIfNotHandled()?.let { resources ->
                 when (resources) {
                     is Resource.Loading -> {}
-                    is Resource.Success -> {
-                        val new  = localChatModel.apply {
-                            this.content = Helper.appendTextToContent(this.content, resources.data.toString())
-                        }
-                        chatAdapter.updateItem(new)
-                        binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
-                    }
-                    is Resource.Error -> {
-                        showShortToast(resources.error?.message.toString())
-                    }
+                    is Resource.Success -> handleSuccess(resources.data)
+                    is Resource.Error -> showShortToast(resources.error.message.toString())
                     is Resource.Empty -> {}
-                    else -> {}
                 }
-
             }
         }
     }
+
+    private fun handleSuccess(data: LocalChat?) {
+        data?.let {
+            chatAdapter.updateItem(it)
+            binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
+        }
+    }
+
 
     private fun getLocalChat(chatType: ChatType, text: String): LocalChat {
         return DataMapper.mapToModel(
