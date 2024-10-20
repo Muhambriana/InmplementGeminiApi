@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.devtools.ksp)
 }
 
 // Load the API key from local.properties
@@ -24,6 +25,7 @@ android {
         targetSdk = 35
         versionCode = 4
         versionName = "1.1.1"
+        multiDexEnabled = true
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // Add the API key as a BuildConfig field
@@ -83,4 +85,17 @@ dependencies {
     implementation(libs.ssp.android)
     implementation(libs.sdp.android)
     implementation(libs.lifecycle.viewmodel.ktx)
+
+    // Room
+    implementation(libs.room.runtime)
+    ksp(libs.room.compiler)
+    androidTestImplementation(libs.room.testing)
+
+    // SQLCipher and SQLite
+    implementation(libs.sqlcipher)
+    implementation(libs.sqlite.ktx)
+
+    // Koin
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
 }
