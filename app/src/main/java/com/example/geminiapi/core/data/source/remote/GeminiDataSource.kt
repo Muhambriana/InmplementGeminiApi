@@ -27,10 +27,10 @@ class GeminiDataSource {
     )
     private val chat = generativeModel.startChat()
 
-    suspend fun getStartChat(history: List<Content>): Chat =
+    fun getStartChat(history: List<Content>): Chat =
         generativeModel.startChat(history)
 
-    suspend fun getStreamMessage(prompt: Prompt): Result<Flow<GenerateContentResponse>?> =
+    fun getStreamMessage(prompt: Prompt): Result<Flow<GenerateContentResponse>?> =
         try {
             Result.success(
                 when(prompt) {

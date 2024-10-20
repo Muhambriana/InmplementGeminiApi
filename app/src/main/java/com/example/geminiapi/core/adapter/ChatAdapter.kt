@@ -1,6 +1,5 @@
 package com.example.geminiapi.core.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -9,7 +8,6 @@ import com.example.geminiapi.core.models.LocalChat
 import com.example.geminiapi.databinding.ItemListMessageInBinding
 import com.example.geminiapi.databinding.ItemListMessageOutBinding
 import com.example.geminiapi.utils.config.ChatType
-import com.google.ai.client.generativeai.type.Content
 import com.google.ai.client.generativeai.type.TextPart
 
 class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
@@ -36,10 +34,12 @@ class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
                 val binding = ItemListMessageInBinding.inflate(inflater, parent, false)
                 LeftViewHolder(binding)
             }
+
             RIGHT_VIEW -> {
                 val binding = ItemListMessageOutBinding.inflate(inflater, parent, false)
                 RightViewHolder(binding)
             }
+
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -58,14 +58,6 @@ class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
     override fun getItemViewType(position: Int): Int {
         // Determine the view type based on the 'type' field
         return if (listOfLocalChat[position].type == ChatType.USER) RIGHT_VIEW else LEFT_VIEW
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun setData(list: List<LocalChat>?) {
-        if (list == null) return
-        listOfLocalChat.clear() // Clear previous data to avoid duplications
-        listOfLocalChat.addAll(list)
-        notifyDataSetChanged() // Notify adapter about the change
     }
 
     inner class LeftViewHolder(private val binding: ItemListMessageInBinding) :
@@ -93,7 +85,7 @@ class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
         fun bind(localChat: LocalChat) {
             binding.apply {
                 // Access the text from content
-                localChat.content?.let { content ->
+                localChat.content.let { content ->
                     // Assuming you're interested in the first part
                     if (content.parts.isNotEmpty()) {
                         val firstPart = content.parts[0]

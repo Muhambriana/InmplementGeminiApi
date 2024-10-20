@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.2"
+#noinspection GradleDependency
 kotlin = "1.9.0"
 coreKtx = "1.13.1"
 junit = "4.13.2"
@@ -20,6 +21,7 @@ room = "2.6.1"
 sqlcipher = "4.4.0"
 sqlite-ktx = "2.4.0"
 koin = "3.5.0"
+#noinspection GradleDependency
 ksp = "1.9.0-1.0.13"
 
 [libraries]
@@ -53,7 +55,6 @@ sqlite-ktx = { group = "androidx.sqlite", name = "sqlite-ktx", version.ref = "sq
 # Koin Libraries
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
-koin-android-viewmodel = { group = "io.insert-koin", name = "koin-android-viewmodel", version.ref = "koin" }
 
 
 [plugins]
