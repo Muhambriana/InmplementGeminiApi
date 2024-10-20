@@ -28,7 +28,7 @@ object Helper {
         // Check if there's a TextPart to update
         if (updatedParts.isNotEmpty() && updatedParts.last() is TextPart) {
             val lastTextPart = updatedParts.last() as TextPart
-            val updatedText = lastTextPart.text + " " + newText // Concatenate old text with new text
+            val updatedText = lastTextPart.text + newText // Concatenate old text with new text
             updatedParts[updatedParts.size - 1] = TextPart(updatedText) // Update the last TextPart
         } else {
             // If there's no TextPart, simply add the new text as a new TextPart
