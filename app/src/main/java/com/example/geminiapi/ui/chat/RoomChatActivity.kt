@@ -1,13 +1,11 @@
 package com.example.geminiapi.ui.chat
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.geminiapi.core.ViewModelFactory
 import com.example.geminiapi.core.adapter.ChatAdapter
@@ -23,11 +21,6 @@ import com.example.geminiapi.utils.helper.DataMapper
 import com.example.geminiapi.utils.helper.Helper
 import com.example.geminiapi.utils.helper.Helper.showShortToast
 import com.google.ai.client.generativeai.Chat
-import com.google.ai.client.generativeai.type.content
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class RoomChatActivity : AppCompatActivity() {
 
@@ -110,6 +103,8 @@ class RoomChatActivity : AppCompatActivity() {
                 is Resource.Success -> {
                     chat = resources.data
                 }
+                is Resource.Empty -> {}
+                is Resource.Error -> {}
             }
         }
     }
@@ -134,7 +129,11 @@ class RoomChatActivity : AppCompatActivity() {
                         chatAdapter.updateItem(new)
                         binding.rvChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
                     }
-                    null -> {}
+                    is Resource.Error -> {
+                        showShortToast(resources.error?.message.toString())
+                    }
+                    is Resource.Empty -> {}
+                    else -> {}
                 }
 
             }

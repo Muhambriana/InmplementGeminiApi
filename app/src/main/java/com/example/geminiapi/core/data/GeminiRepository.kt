@@ -16,7 +16,7 @@ class GeminiRepository(
     suspend fun getStartChat(history: List<Content>): Chat =
         geminiDataSource.getStartChat(history)
 
-    suspend fun getStreamMessage(chat: Chat?, prompt: Prompt): Flow<GenerateContentResponse>? =
+    suspend fun getStreamMessage(chat: Chat?, prompt: Prompt): Result<Flow<GenerateContentResponse>?> =
         geminiDataSource.getStreamMessage(chat, prompt)
 
 }
