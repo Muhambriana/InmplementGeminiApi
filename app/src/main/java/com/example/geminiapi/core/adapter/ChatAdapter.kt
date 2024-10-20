@@ -8,6 +8,8 @@ import com.example.geminiapi.core.models.LocalChat
 import com.example.geminiapi.databinding.ItemListMessageInBinding
 import com.example.geminiapi.databinding.ItemListMessageOutBinding
 import com.example.geminiapi.utils.config.ChatType
+import com.example.geminiapi.utils.helper.Helper
+import com.example.geminiapi.utils.helper.Helper.getTextFromContent
 import com.google.ai.client.generativeai.type.TextPart
 
 class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
@@ -65,17 +67,7 @@ class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
         fun bind(localChat: LocalChat) {
             binding.apply {
                 itemUsername.text = localChat.type?.alias
-
-                // Access the text from content
-                localChat.content.let { content ->
-                    // Assuming you're interested in the first part
-                    if (content.parts.isNotEmpty()) {
-                        val firstPart = content.parts[0]
-                        if (firstPart is TextPart) {
-                            itemMessage.text = firstPart.text // Set the text in your TextView
-                        }
-                    }
-                }
+                itemMessage.text = getTextFromContent(localChat.content)
             }
         }
     }
@@ -84,16 +76,7 @@ class ChatAdapter : RecyclerView.Adapter<ViewHolder>() {
         ViewHolder(binding.root) {
         fun bind(localChat: LocalChat) {
             binding.apply {
-                // Access the text from content
-                localChat.content.let { content ->
-                    // Assuming you're interested in the first part
-                    if (content.parts.isNotEmpty()) {
-                        val firstPart = content.parts[0]
-                        if (firstPart is TextPart) {
-                            itemMessage.text = firstPart.text // Set the text in your TextView
-                        }
-                    }
-                }
+                itemMessage.text = getTextFromContent(localChat.content)
             }
         }
     }
