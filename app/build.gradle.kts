@@ -16,11 +16,11 @@ val aiStudioApiKey: String by lazy {
 }
 
 android {
-    namespace = "com.example.geminiapi"
+    namespace = "com.mshell.geminiapi"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.geminiapi"
+        applicationId = "com.mshell.geminiapi"
         minSdk = 24
         targetSdk = 35
         versionCode = 4
